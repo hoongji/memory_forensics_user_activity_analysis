@@ -8,7 +8,7 @@ NTML 해시를 추출, 평문화한 메모리 포렌식 사례 분석 프로젝�
 ---
 
 ## 1. 프로젝트 개요 
-## 분석 목적
+**분석 목적**
 해당 프로젝트는 [포트폴리오2: Windows 메모리 덤프 정상성 분석](https://github.com/hoongji/memory_forensics_process_analysis) 에서 사용한 동일한 메모리 덤프를 대상으로 진행한다.
 시스템의 정상 여부 확인이 아닌 사용자 인증 정보가 메모리에 잔존하는지 여부를 검증하고, 이를 실제 문제로 연결하는 것을 목표로 한다.
 
@@ -24,18 +24,18 @@ Host OS: Windows
 분석 대상: Windows 7 SP1 x64
 
 분석 도구: 
-Python 3.10.11
-python 2.17.18
-Volatility 2.6
-Volatility 3
-pypykatz
-hashcat 7.1.2
-John the Ripper 1.9.0
+- Python 3.10.11
+- python 2.17.18
+- Volatility 2.6
+- Volatility 3
+- pypykatz
+- hashcat 7.1.2
+- John the Ripper 1.9.0
 - Wordlist: rockyou.txt
 
 ---
 
 # 3. 초기 환경
-## 3.1 OS 정보 확인
+**3.1 OS 정보 확인**
 windows.info 플러그인을 통해 대상 시스템이 Windows 7 계열 64bit 환경임을 확인
 
