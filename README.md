@@ -1,9 +1,9 @@
 # Memory Forensics: User Credential Recovery from Windows 7 Memory Dump
 
-## Windows 7 메모리 덤프에서 사용자(john)의 비밀번호를 복구하기 위해 
-## lsass.exe 기반 자격 증명 분석을 수행하고, 
-## Volatility 3의 한계를 확인한 뒤 Volatility2 로 전환하여 
-## NTML 해시를 추출, 평문화한 메모리 포렌식 사례 분석 프로젝트
+ Windows 7 메모리 덤프에서 사용자(john)의 비밀번호를 복구하기 위해 
+lsass.exe 기반 자격 증명 분석을 수행하고, 
+Volatility 3의 한계를 확인한 뒤 Volatility2 로 전환하여 
+NTML 해시를 추출, 평문화한 메모리 포렌식 사례 분석 프로젝트
 
 ---
 
