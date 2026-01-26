@@ -34,6 +34,15 @@ Host OS: Windows
 - Wordlist: rockyou.txt
 
 
+### 데이터 출처
+
+- 메모리 덤프 출처: TryHackMe – Memory Forensics 실습 과제
+- 제공 형태: Windows 메모리 덤프 (VMEM)
+- 시나리오: 가상의 사용자(John) 환경에서 수집된 메모리 덤프
+- 목적: 디지털 포렌식 분석 흐름 학습 및 사용자 행위 분석 연습 (해당 덤프는 교육 목적의 공개 자료)
+- 참고 링크: [https://tryhackme.com/](https://tryhackme.com/room/memoryforensics)
+
+
 
 # 3. 초기 환경
 **3.1 OS 정보 확인** 
@@ -58,7 +67,7 @@ Kernel Base 주소가 정상적으로 식별되었고 이후 프로세스 및 �
 
  ### 5.1 사용자 계정 직접 확인 시도
  - Volatilit 2의 **windows.users** 플러그인을 통해 사용자 확인을 시도했다.
- - 프로젝트 분석시 먼저 사용한 Volatility 3 버전에서는 제거된 플러그인 이었기에 직접적인 사용자 목록은 확인기 불가하였다.
+ - 프로젝트 분석시 먼저 사용한 Volatility 3 버전에서는 제거된 플러그인 이었기에 직접적인 사용자 목록은 확인이이 불가하였다.
  - 대신 인증 프름을 담당하는 프로세스를 기준으로 간접 검증 전략으로 변경하였다.
 
 
@@ -99,5 +108,55 @@ windows.dumpdfiles 플러그인을 사용하여 lsass.exe(PID 496) 프로세스�
 
 ### 6.2 자격 증명 추출 시도
 ![pypykatz 추출 실패](screenshots/pypykatz)
-pypykatz를 이용하여 계정,해시,비밀번호를 추출하려고 했으나, 
-volatility2로 구하는 메모리 덤프여서 안되는건지,,, volatility3 프레임워크로 해당메모리 덤프를 pypykatz 를이용해서 구하려고 해서 실패한건지.,..이 부분을 어케 써야함?
+
+pypykatz 실행 시 위와 같은 오류가 반복적으로 발생했다. 
+*python -m pypykatz* , *pypykatz lsa minidump <dumpfile>* , *패키지 재설치(pip uninstall / reinstall)* , *명령어 변경 및 강제 실행*을 시도하였으나 모두 동일한 오류가 발생되었다. 이로 인해 lsass 덤프 분석 단계 이전에 pypykatz 도구가 Python 실행 단계에서 정상적으로 구동되지 않았다는 사실을 알 수 있었다. 
+
+python 패키지는 정상적으로 설치된 상태였으나, Pyhton 모듈 실행 방식(-m)과 exe 래퍼 방식 모두 실패하였다. 
+lsass 메모리 내 인증정보의 존재 여부와는 무관하게 도구 실행 구조상의 한계로 판단하였다. 
+
+한편 Voltatility3 의 **windows.dumpfiles** 플러그인은 **ImageSectionObject**에 매핑된 메모리영역을 중심으로 덤프를 수행하므로, ㅣlsasss 프로세스의 heap 또는 private memory 영역이 포함되지 않았을 경우도 함께 고려하면 사용자 인증정보 영역이 포함되어 있지 않거나 분리되어 있을 가능성도 함께 고려해야했다. 
+이를 통해 본 덤프 파일만으로는 자격 증명 추출이 제한될 수 있다는 판단을 내렸다. 
+
+**이와 같은 제약으로 인해, 해당 실습에서는 사용자 정보 추출에 대해 Volatility2 사용을 권장한 실습 가이드의 방향에 따라 분석 도구를 Volatility2 로 전환하여 진행하기로 하였다.**
+
+
+# 7 Volatility2 전환 및 검증
+### 7.1 프로파일 사전 검증 과정(imageinfo)
+![volatility2 imageinfo](screenshots/vol2.6_imageinfo)
+
+메모리 덤프의 운영체제 버전과 커널 구조를 추정하기 위해 Volatility2의 imageinfo 플러그인을 실행하였다. 
+
+분석 결과, 여러 개의 예상 프로파일이 제시되었으며 이 중 **Win7SP1x64**를 사용하기로 결정했다. 
+
+*해당 프로파일을 선택한 이유는 TryHackMe Windows 메모리 분석 문제에서 가장 빈번하게 사용되며, 공식 walkthrough에서도 주로 채택되는 프로파일이기 때문에 선택하였다.*
+
+### 7.2 프로세스 구조 검증(pslist)
+![volatility2 pslist](screenshots/vol2.6_pslist)
+
+선택한 프로파일이 실제로 적절한지 확인하기 위해
+**profile=Win7SP1x64 pslist** 플러그인을 실행하였다.
+
+이 단계에서는 다음 두 자기를 중점적으로 확인하였다.
+
+1. lsass.exe 프로세스의 존재 여부
+2. 시스템 프로세스 트리가 정상적으로 파싱되는지 여부
+   
+lsass.exe 존재여부를 확인하고 pid , 시스템이 정상적으로 파싱되는지를 확인해보기로 했다. 
+lsass.exe가 정상적인 부모 프로세스(wininit.exe) 하위에서 실행되고 있음을 확인함으로써, 해당 메모리 덤프는 자격증명 분석을 수행하기에 메모리 구조가 정상적으로 파싱되었음을 판단하였다. 
+
+*시스템이 정상적으로 파싱되는지 = 메모리 덤프에서 커널 구조(KDBG)가 정상적으로 식별되었고, 프로세스 리스트가 일관된 구조로 파싱되고 있음을 의미*
+
+
+### 7.3 NTLM 해시 추출(hashdump)
+![volatility2 hashdump](screenshots/vol2.6_hashdump)
+
+자격 증명 정보를 확보하기 위해
+Volatility2의 hashdump 플러그인을 실행하여 사용자의 비밀번호를 파악하고자 하였다. 
+volatiliy3가 아닌 volatility2를 이용해서 해당 메모리 덤프를 분석하라는 권유가 있는 이유는 volatility2가 정확도 보다 획득 가능성을 우선한 방식이라 그런것같다. 안정성을 이유로 volatility3에서는 제거가 된 플러그인이다. 해당 단계에서 john의 비밀번호가 나오는데 NTML 해시 문자열이 나온다. 
+
+### 7.4 비밀번호 평문화 과정(hashcat)
+
+안됨.. 
+
+### 7.5 john the ripper 사용
