@@ -47,7 +47,7 @@ Host OS: Windows
 # 3. 초기 환경
 **3.1 OS 정보 확인** 
 
-![windows.info 결과](screenshots/windows.info)
+![windows.info 결과]()
 
 windows.info 플러그인을 통해 대상 시스템이 Windows 7 계열 64bit 환경임을 확인함.
 Kernel Base 주소가 정상적으로 식별되었고 이후 프로세스 및 인증 정보 분석이 가능한 상태로 판단된다.
