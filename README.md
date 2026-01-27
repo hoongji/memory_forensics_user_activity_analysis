@@ -47,7 +47,7 @@ Host OS: Windows
 # 3. 초기 환경
 **3.1 OS 정보 확인** 
 
-![windows.info 결과]()
+![windows.info 결과](screenshots/windows.info.png)
 
 windows.info 플러그인을 통해 대상 시스템이 Windows 7 계열 64bit 환경임을 확인함.
 Kernel Base 주소가 정상적으로 식별되었고 이후 프로세스 및 인증 정보 분석이 가능한 상태로 판단된다.
@@ -74,7 +74,7 @@ Kernel Base 주소가 정상적으로 식별되었고 이후 프로세스 및 �
 ### 5.2 lsass.exe 프로세스 확인 
 *lsass.exe는 Windows에서 인증,계정,해시 처리를 담당하는 핵심 프로세스이므로 사용자 비밀번호, NTLM 해시, Kerberos 티켓 등은 **로그인 이후 lsass 메모리에 잔존 가능성**이 있다고 판단하여 lsass.exe 프로세스를 확인하고자 하였다.*
 
-![windows.pslist 결과](screenshots/windows.pslist) 
+![windows.pslist 결과](screenshots/windows.pslist.png) 
 lsass.exe (PID 496) 이 정상적인 경로로 실행됨을 확인하였다. 
 
 ![windows.cmdline 결과](screenshots/windows.cmdline) 
