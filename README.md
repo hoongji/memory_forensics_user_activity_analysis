@@ -201,7 +201,7 @@ hashcat은 설치 경로인 C:\hashcat-7.1.2 디렉토리에서 실행하였다.
 ![hash.txt 파일](screenshots/hash.txt.png)
 해시 파일(hash.txt) 내용 정상 여부 확인
 
-![hashcat 설치 확인](screenshots/hash_installed.png)
+![hashcat 설치 확인](screenshots/hashcat_installed.png)
 hashcat 설치 정상 여부 확인
 
 ![rockyou.txt 파일](screenshots/dir_rockyou.png)
