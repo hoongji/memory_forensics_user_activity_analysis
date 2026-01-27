@@ -77,15 +77,15 @@ Kernel Base 주소가 정상적으로 식별되었고 이후 프로세스 및 �
 ![windows.pslist 결과](screenshots/windows.pslist.png) 
 lsass.exe (PID 496) 이 정상적인 경로로 실행됨을 확인하였다. 
 
-![windows.cmdline 결과](screenshots/windows.cmdline) 
+![windows.cmdline 결과](screenshots/windows.cmdline.png) 
 실행 경로가 C:\Windows\System32\lsass.exe 임을 확인하였다. 
 
 정상 경로와 정상 PID 이므로 위장 프로세스 가능성이 낮다고 판단하였다. 
 
 
 ### 5.3 메모리 점유 여부 확인 
-![windows.memmap --pid 496](screenshots/memmap1)
-![windows.memmap 결과](screenshots/memmap2)
+![windows.memmap --pid 496](screenshots/memmap1.png)
+![windows.memmap 결과](screenshots/memmap2.png)
 windows.memmap 플러그인을 통해 pid 496(lsass.exe)가 다수의 가상 메모리 영역을 실제로 점유 중임을 확인하였다. 
 출력이 수십줄이 나와 프로세스가 정상적으로 메모리에 되었음을 확인하였다. (덤프 대상이 존재함)
 이를 통해 해당 프로세스의 메모리 덤프가 가능하다고 판단하고, 자격 증명 정보 분석을 위해 메모리 덤프를 진행하였다. 
@@ -93,10 +93,10 @@ windows.memmap 플러그인을 통해 pid 496(lsass.exe)가 다수의 가상 메
 
 # 6 lsass.exe 메모리 덤프 및 한계
 ### 6.1 메모리 덤프 
-![windows.dumpfiles --pid 496](screenshots/dumpfiles)
+![windows.dumpfiles --pid 496](screenshots/dumpfiles.png)
 pid 496(lsass.exe)가 사용하던 메모리 영역 파일로 매핑된 영역(imageSectionObject)을 개별 파일로 덤프했다. 
 
-![lsass.exe의 이미지 경로 확인. ImageSectionObject.lsass.exe.img](screenshots/dumpfiles_lsass.exe)
+![lsass.exe의 이미지 경로 확인. ImageSectionObject.lsass.exe.img](screenshots/dumpfiles_lsass.exe.png)
 
 
 windows.dumpdfiles 플러그인을 사용하여 lsass.exe(PID 496) 프로세스의 메모리 영역을 덤프하였다. 
@@ -112,7 +112,7 @@ Volatility3 환경에서 lsass 프로세스 메모리를 대상으로 자격 증
 
 앞선 단계에서 **windows.dumpfiles** 플러그인을 통해 lsass.exe의 메모리 이미지(**ImageSectionObject.lsass.exe.img**) 를 확보하였으며, 이를 기반으로 다음과 같이 pypykatz 실행을 시도하였다. 
 
-![pypykatz 추출 실패](screenshots/pypykatz)
+![pypykatz 추출 실패](screenshots/pypykatz.png)
 
 그러나 해당 환경에서는 pypykatz 가 정상적으로 실행되지 않았으며, 자격 증명(계정 정보, 해시, 비밀번호)을 추출하는 단계까지 도달하지 못하였다. 
  
@@ -133,7 +133,7 @@ Volatility3 에서는 안정성과 구조적 분석을 우선하는 방향으로
 
 # 7 Volatility2 전환 및 검증
 ### 7.1 프로파일 사전 검증 과정(imageinfo)
-![volatility2 imageinfo](screenshots/vol2.6_imageinfo)
+![volatility2 imageinfo](screenshots/vol2.6_imageinfo.png)
 
 메모리 덤프의 운영체제 버전과 커널 구조를 추정하기 위해 Volatility2의 imageinfo 플러그인을 실행하였다. 
 
@@ -143,7 +143,7 @@ Volatility3 에서는 안정성과 구조적 분석을 우선하는 방향으로
 
 
 ### 7.2 프로세스 구조 검증(pslist)
-![volatility2 pslist](screenshots/vol2.6_pslist)
+![volatility2 pslist](screenshots/vol2.6_pslist.png)
 
 선택한 프로파일이 실제로 적절한지 확인하기 위해
 **profile=Win7SP1x64 pslist** 플러그인을 실행하였다.
@@ -170,7 +170,7 @@ Volatility2의 환경에서 재분석하기로 결정하였다.
 
 Volatility 2에서는 hashdump 플러그인을 통해 사용자의 계정의 NTLM 해시를 직접 추출할 수 있으며, 이를 통해 비밀번호 복구를 위한 최소한의 인증 정보를 확보할 수 있다. 
 
-![volatility2 hashdump](screenshots/vol2.6_hashdump)
+![volatility2 hashdump](screenshots/vol2.6_hashdump.png)
 
 hashdump 실행 결과, john 사용자 계정에 대한 NTLM 해시 값이 정상적으로 추출되었으며, 해당 값은 아직 평문화되지 않은 상태의 해시 문자열이다. 
 
@@ -191,14 +191,14 @@ hashcat 7.1.2 버전을 설치한 후, *hash.txt* 파일과 사전 파일(*rocky
 
 hashcat은 설치 경로인 C:\hashcat-7.1.2 디렉토리에서 실행하였다.
 
-![hashcat 실행](screenshots/hashcat1)
-![hashcat 결과](screenshots/hashcat2)
+![hashcat 실행](screenshots/hashcat1.png)
+![hashcat 결과](screenshots/hashcat2.png)
 
 실행 결과, 크랙 과정이 정상적으로 진행되지 않고 *Strated* 이후 즉시 *Stopped* 상태로 종료되는 현상이 반복적으로 발생하였다. 
 
 *hashcat 자체의 설정 오류 가능성을 배제하기 위해 다음과 같은 기본 검증 절차를 수행하였다.*
 
-![hash.txt 파일](screenshots/hash.txt)
+![hash.txt 파일](screenshots/hash.txt.png)
 해시 파일(hash.txt) 내용 정상 여부 확인
 
 ![hashcat 설치 확인](screenshots/hash 설치됨)
