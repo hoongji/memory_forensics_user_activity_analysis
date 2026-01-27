@@ -112,7 +112,7 @@ Volatility3 환경에서 lsass 프로세스 메모리를 대상으로 자격 증
 
 앞선 단계에서 **windows.dumpfiles** 플러그인을 통해 lsass.exe의 메모리 이미지(**ImageSectionObject.lsass.exe.img**) 를 확보하였으며, 이를 기반으로 다음과 같이 pypykatz 실행을 시도하였다. 
 
-![pypykatz_추출_실패](screenshots/pypykatz .png)
+![pypykatz_추출_실패](screenshots/pypykatz1.png)
 
 그러나 해당 환경에서는 pypykatz 가 정상적으로 실행되지 않았으며, 자격 증명(계정 정보, 해시, 비밀번호)을 추출하는 단계까지 도달하지 못하였다. 
  
